@@ -8,8 +8,8 @@ c2 = Course("05696111", "Foundation of Programming")
 c1.enroll(s)
 c2.enroll(s)
 
-print("--- ผลลัพธ์ c1.display() ---")
+print("--- result c1.display() ---")
 c1.display()
 
-print("\n--- ผลลัพธ์ s.display() ---")
+print("\n--- rsult s.display() ---")
 s.display()
