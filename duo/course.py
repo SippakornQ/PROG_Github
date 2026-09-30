@@ -1,24 +1,20 @@
-def create_course(course_id, title):
-    return {"id": course_id, "title": title, "students": []}
+class Course:
+    def __init__(self, id, title):
+        self.id = id
+        self.title = title
+        self.students = []
 
+    def enroll(self, student):
+        if student not in self.students:
+            self.students.append(student)
+        if self not in student.courses:
+            student.courses.append(self)
 
-def enroll(course, student):
-    if student not in course["students"]:
-        course["students"].append(student)
-    if course not in student["courses"]:
-        student["courses"].append(course)
+    def remove(self, student):
+        if student in self.students:
+            self.students.remove(student)
+        if self in student.courses:
+            student.courses.remove(self)
 
-
-def remove_enrollment(course, student):
-    if student in course["students"]:
-        course["students"].remove(student)
-    if course in student["courses"]:
-        student["courses"].remove(course)
-
-
-def display_course(course):
-    formatted_students = [
-        f"({s['id']}, '{s['first_name']} {s['last_name']}')"
-        for s in course["students"]
-    ]
-    print("[" + ", ".join(formatted_students) + "]")
+    def display(self):
+        print(self.students)
