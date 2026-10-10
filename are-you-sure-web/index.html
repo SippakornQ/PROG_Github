@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Are You Sure?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Kanit:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #3C0F14;      /* สีแดงเลือดหมูเข้ม */
+            --bg-cream: #E6E1DC;     /* สีครีม/เทาอ่อน */
+            --accent-dark: #24080B;  /* สีน้ำตาลแดงเข้ม */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: var(--bg-dark);
+            font-family: 'Kanit', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+            padding: 20px 0;
+            user-select: none;
+        }
+
+        .bg-lines {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: repeating-conic-gradient(
+                from 0deg, 
+                rgba(230, 225, 220, 0.03) 0deg 15deg, 
+                transparent 15deg 30deg
+            );
+            animation: rotateBg 180s linear infinite;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        @keyframes rotateBg {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .main-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            max-width: 420px;
+            width: 100%;
+        }
+
+        .speech-bubble {
+            background-color: var(--bg-cream);
+            color: var(--accent-dark);
+            padding: 10px 32px;
+            border-radius: 40px;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            border: 4px solid var(--accent-dark);
+            box-shadow: 0 8px 0px var(--accent-dark);
+            position: relative;
+            transform: translateY(0);
+            transition: transform 0.08s ease-out;
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 16px 12px 0 12px;
+            border-style: solid;
+            border-color: var(--bg-cream) transparent transparent transparent;
+            display: block;
+            width: 0;
+        }
+
+        .card-frame {
+            position: relative;
+            background: var(--bg-cream);
+            padding: 14px;
+            border-radius: 28px;
+            border: 4px solid var(--accent-dark);
+            box-shadow: 10px 12px 0px var(--accent-dark), 0 20px 40px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+            width: 100%;
+            touch-action: manipulation;
+        }
+
+        .card-frame:active {
+            transform: scale(0.96) translateY(4px);
+            box-shadow: 4px 6px 0px var(--accent-dark);
+        }
+
+        .image-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 18px;
+            border: 3px solid var(--accent-dark);
+            aspect-ratio: 3/4;
+            background-color: #2a0a0d;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+        }
+
+        .badge {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background-color: var(--bg-dark);
+            color: var(--bg-cream);
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border: 2px solid var(--bg-cream);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+        }
+
+        .controls-panel {
+            background-color: var(--bg-cream);
+            border: 4px solid var(--accent-dark);
+            box-shadow: 6px 6px 0px var(--accent-dark);
+            border-radius: 20px;
+            padding: 16px 20px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            color: var(--accent-dark);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]:focus { outline: none; }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 10px;
+            cursor: pointer;
+            background: var(--bg-dark);
+            border-radius: 5px;
+            border: 2px solid var(--accent-dark);
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: var(--bg-cream);
+            border: 3px solid var(--accent-dark);
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -7px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hint-text {
+            color: var(--bg-cream);
+            font-size: 0.9rem;
+            opacity: 0.85;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        .shake-effect {
+            animation: shake 0.15s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: scale(1.02) translate(0, 0); }
+            50% { transform: scale(1.04) translate(-4px, 2px) rotate(-2deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-lines"></div>
+
+    <div class="main-container">
+        <div class="speech-bubble" id="speech-bubble">
+            ARE YOU SURE?
+        </div>
+
+        <div class="card-frame" id="clickable-card">
+            <div class="badge">Are you sure the code is correct?</div>
+            <div class="image-wrapper">
+                <img src="76680.jpg" alt="Are you sure character">
+            </div>
+        </div>
+
+        <div class="controls-panel">
+            <div class="control-group">
+                <div class="control-label">
+                    <span>🎵 Pitch</span>
+                    <span id="pitch-val">0.75</span>
+                </div>
+                <input type="range" id="pitch-slider" min="0.4" max="1.5" step="0.05" value="0.75">
+            </div>
+
+            <div class="control-group">
+                <div class="control-label">
+                    <span>⚡ Speed</span>
+                    <span id="rate-val">0.90</span>
+                </div>
+                <input type="range" id="rate-slider" min="0.5" max="2.0" step="0.05" value="0.90">
+            </div>
+        </div>
+
+        <p class="hint-text">🎙️ Click the image to hear the sound of a man spamming </p>
+    </div>
+
+    <script>
+        const card = document.getElementById('clickable-card');
+        const bubble = document.getElementById('speech-bubble');
+        const pitchSlider = document.getElementById('pitch-slider');
+        const rateSlider = document.getElementById('rate-slider');
+        const pitchVal = document.getElementById('pitch-val');
+        const rateVal = document.getElementById('rate-val');
+
+        pitchSlider.addEventListener('input', () => pitchVal.textContent = pitchSlider.value);
+        rateSlider.addEventListener('input', () => rateVal.textContent = rateSlider.value);
+
+        let audioCtx = null;
+        let audioBuffer = null;
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // ลองโหลดไฟล์เสียงผู้ชายที่สร้างขึ้นมา (are-you-sure.wav หรือ are-you-sure.mp3)
+        async function loadAudioFile() {
+            const files = ['are-you-sure.wav', 'are-you-sure.mp3'];
+            for (let file of files) {
+                try {
+                    const res = await fetch(file);
+                    if (res.ok) {
+                        const data = await res.arrayBuffer();
+                        initAudioContext();
+                        audioBuffer = await audioCtx.decodeAudioData(data);
+                        console.log("โหลดไฟล์เสียงสำเร็จ:", file);
+                        break;
+                    }
+                } catch (e) {}
+            }
+        }
+        loadAudioFile();
+
+        function playMaleVoice() {
+            initAudioContext();
+            const speed = parseFloat(rateSlider.value);
+            const pitch = parseFloat(pitchSlider.value);
+
+            // 1. ถ้ามีไฟล์เสียง ให้เล่นผ่าน Web Audio API (กดสแปม 0ms Latency)
+            if (audioBuffer && audioCtx) {
+                const source = audioCtx.createBufferSource();
+                source.buffer = audioBuffer;
+                source.playbackRate.value = speed;
+                source.detune.value = (pitch - 1) * 1200;
+                source.connect(audioCtx.destination);
+                source.start(0);
+            } 
+            // 2. ถ้าไม่มีไฟล์ ให้เจาะจงใช้เสียงผู้ชายจากระบบเบราว์เซอร์
+            else if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance("Are you sure?");
+                utterance.lang = "en-US";
+                
+                // ค้นหาเสียงผู้ชายในระบบ
+                const voices = window.speechSynthesis.getVoices();
+                const maleVoice = voices.find(v => 
+                    v.lang.startsWith('en') && 
+                    (v.name.includes('Male') || v.name.includes('David') || v.name.includes('Mark') || v.name.includes('George'))
+                );
+                if (maleVoice) utterance.voice = maleVoice;
+
+                utterance.pitch = pitch;
+                utterance.rate = speed;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        card.addEventListener('pointerdown', function(e) {
+            e.preventDefault();
+            card.classList.remove('shake-effect');
+            void card.offsetWidth;
+            card.classList.add('shake-effect');
+
+            bubble.style.transform = 'scale(1.1) translateY(-6px)';
+            setTimeout(() => bubble.style.transform = 'translateY(0)', 80);
+
+            playMaleVoice();
+        });
+
+        // โหลดรายการเสียงเมื่อเบราว์เซอร์พร้อม
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+        }
+    </script>
+
+</body>
+</html>

@@ -6,12 +6,12 @@ def sum(x):
 
 def count(x):
     total_items = 0
-    for _ in x:
+    for i in x:
         total_items += 1
     return total_items
 
 def max(x):
-    biggest = x[0]
+    biggest = x[2]
     for num in x:
         if num > biggest:
             biggest = num

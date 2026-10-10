@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Write on me!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* แก้ไข Syntax ตรงนี้ให้ถูกต้อง */
+            --bg-cream: #FDFBF7;
+            --primary-blue: #1E88E5;
+            --dark-blue: #0D47A1;
+            --text-color: #1565C0;
+            --panel-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-cream);
+            font-family: 'Kanit', sans-serif;
+            overflow: hidden; 
+            cursor: crosshair; 
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(30, 136, 229, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30, 136, 229, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Navbar & Header */
+        .header {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background-color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            box-shadow: 0 8px 20px rgba(13, 71, 161, 0.1);
+            border: 2px solid var(--primary-blue);
+            z-index: 100;
+            pointer-events: auto;
+            cursor: default;
+        }
+
+        h1 {
+            font-family: 'Fredoka', sans-serif;
+            color: var(--primary-blue);
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .timer-badge {
+            background-color: var(--dark-blue);
+            color: var(--bg-cream);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        /* --- กล่องคำอธิบายวิธีใช้งาน (Info Panel) --- */
+        .info-panel {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--panel-bg);
+            border: 2px solid var(--primary-blue);
+            border-radius: 16px;
+            padding: 16px 24px;
+            box-shadow: 0 4px 15px rgba(13, 71, 161, 0.1);
+            z-index: 90;
+            pointer-events: auto;
+            cursor: default;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .info-panel h3 {
+            color: var(--dark-blue);
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .info-list {
+            list-style: none;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            text-align: left;
+        }
+
+        .info-list li {
+            margin-bottom: 6px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .info-list li::before {
+            content: '🔹';
+            position: absolute;
+            left: 0;
+            font-size: 0.8rem;
+            top: 2px;
+        }
+
+        /* ข้อความที่ถูกเขียนลงไป */
+        .written-text {
+            position: absolute;
+            color: var(--dark-blue);
+            font-size: 1.2rem;
+            font-weight: 400;
+            pointer-events: none;
+            z-index: 10;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            white-space: nowrap;
+        }
+
+        /* กล่อง Input สำหรับพิมพ์ */
+        .text-input {
+            position: absolute;
+            background: transparent;
+            border: none;
+            border-bottom: 2px dashed var(--primary-blue);
+            color: var(--dark-blue);
+            font-family: 'Kanit', sans-serif;
+            font-size: 1.2rem;
+            outline: none;
+            z-index: 20;
+            padding: 2px;
+            width: 200px;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>✏️ Write on me!</h1>
+        <div class="timer-badge">
+            ⏱ <span id="countdown">00:00</span>
+        </div>
+    </div>
+
+    <!-- กล่องคำอธิบาย -->
+    <div class="info-panel" id="infoPanel">
+        <h3>💡 How to use the board</h3>
+        <ul class="info-list">
+            <li><strong>Left-click</strong> Click anywhere on the board to start typing.</li>
+            <li>When you have finished typing, press the <strong>Enter</strong> Or click elsewhere to place the text.</li>
+            <li>The board will be... <strong> Automatic Reset (Reset) </strong> Every 30 minutes in real-time</li>
+        </ul>
+    </div>
+
+    <script>
+        function getNextResetTime() {
+            const now = new Date();
+            const next = new Date(now);
+            if (now.getMinutes() < 30) {
+                next.setMinutes(30, 0, 0);
+            } else {
+                next.setHours(now.getHours() + 1, 0, 0, 0);
+            }
+            return next;
+        }
+
+        let resetTime = getNextResetTime();
+        const countdownEl = document.getElementById('countdown');
+
+        setInterval(() => {
+            const now = new Date();
+            let diff = resetTime - now;
+
+            if (diff <= 0) {
+                clearBoard();
+                resetTime = getNextResetTime();
+                diff = resetTime - now;
+            }
+
+            const minutes = Math.floor((diff / 1000 / 60) % 60);
+            const seconds = Math.floor((diff / 1000) % 60);
+            
+            countdownEl.textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }, 1000);
+
+        let activeInput = null;
+
+        document.body.addEventListener('click', function(e) {
+            if (e.target.closest('.header') || e.target.closest('.info-panel') || e.target.tagName === 'INPUT') return;
+
+            const infoPanel = document.getElementById('infoPanel');
+            if (infoPanel.style.display !== 'none') {
+                infoPanel.style.opacity = '0';
+                infoPanel.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => infoPanel.style.display = 'none', 300);
+            }
+
+            if (activeInput) {
+                activeInput.remove();
+            }
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'text-input';
+            input.style.left = e.pageX + 'px';
+            input.style.top = (e.pageY - 12) + 'px';
+            input.placeholder = "Type a message...";
+            
+            document.body.appendChild(input);
+            input.focus();
+            activeInput = input;
+
+            input.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter' && this.value.trim() !== '') {
+                    saveText(this.value, e.pageX, e.pageY - 12);
+                    this.remove();
+                    activeInput = null;
+                }
+            });
+
+            input.addEventListener('blur', function() {
+                if (this.value.trim() !== '') {
+                    saveText(this.value, e.pageX, e.pageY - 12);
+                }
+                this.remove();
+                activeInput = null;
+            });
+        });
+
+        function saveText(text, x, y) {
+            const span = document.createElement('span');
+            span.className = 'written-text';
+            span.textContent = text;
+            span.style.left = x + 'px';
+            span.style.top = y + 'px';
+            document.body.appendChild(span);
+        }
+
+        function clearBoard() {
+            const texts = document.querySelectorAll('.written-text');
+            texts.forEach(text => {
+                text.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                text.style.opacity = '0';
+                text.style.transform = 'scale(0)';
+                setTimeout(() => text.remove(), 500);
+            });
+        }
+    </script>
+</body>
+</html>

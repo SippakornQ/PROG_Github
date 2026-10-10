@@ -1,5 +1,3 @@
-# Student A (JJ) - Command-Line Interface
-
 from implementation import analyze_scores, passing_students
 
 def parse_user_scores():
@@ -12,7 +10,7 @@ def parse_user_scores():
     try:
         score_list = [float(val) for val in raw_input.split()]
         for score in score_list:
-            if score <= 0 or score >= 100:
+            if score < 0 or score > 100:
                 print(f"  [!] Error: Invalid score '{score}'. Score must be between 0 and 100.")
                 return None
 
